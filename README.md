@@ -4,11 +4,11 @@ URL Blaster is a tool to shorten URLs.
 
 For example you have a link like this:
 
-https://source.golabs.io/daniel.santoso/url-blaster
+"https://source.golabs.io/daniel.santoso/url-blaster"
 
 You can make a shorter version of it like this:
 
-https://localhost:9080/URLBlaster
+"https://localhost:9080/URLBlaster" -> just an example
 
 # Installation
 
@@ -54,6 +54,7 @@ go build
 
 # This will run all the tests.
 go test
+```
 
 ## Running the service
 
