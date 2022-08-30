@@ -1,0 +1,16 @@
+stages:
+  - compile
+  - test
+
+build:
+  stage: compile
+  image: golang:1.18
+  script:
+    - go get -d -v
+    - go build -o bin/my-url-shortener -v .
+
+test:
+  stage: test
+  image: golang:1.18
+  script:
+    - go test
