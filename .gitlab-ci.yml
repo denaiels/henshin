@@ -13,4 +13,5 @@ test:
   stage: test
   image: golang:1.18
   script:
+    - golangci-lint run
     - go test
