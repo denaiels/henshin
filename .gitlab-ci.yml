@@ -13,6 +13,5 @@ test:
   stage: test
   image: golang:1.18
   script:
-    - curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin
-    - golangci-lint run
+    - go run github.com/golangci/golangci-lint/cmd/golangci-lint@v1.49.0 run
     - go test
