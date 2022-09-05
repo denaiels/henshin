@@ -5,13 +5,14 @@ stages:
 build:
   stage: compile
   image: golang:1.18
+  before_script:
+    - apt-get update && apt-get install make
   script:
-    - go get -d -v
-    - go build -o bin/my-url-shortener -v .
+    - make ci
 
 test:
   stage: test
   image: golang:1.18
   script:
-    - go run github.com/golangci/golangci-lint/cmd/golangci-lint@v1.49.0 run
-    - go test
+    - make test
+    - make clean
