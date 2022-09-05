@@ -38,10 +38,7 @@ To setup, please run the following commands:
 Install package dependencies
 
 ```sh-session
-go mod vendor
-```
-```sh-session
-go mod tidy
+make setup
 ```
 
 ## Building, Testing, and Running the service
@@ -50,10 +47,10 @@ To build the service, please run the following commands:
 
 ```sh-session
 # This will generate an executable in ./out directory.
-go build
+make build
 
 # This will run all the tests.
-go test
+make test
 ```
 
 ## Running the service
@@ -61,7 +58,7 @@ go test
 To run the service, please run the following commands:
 
 ```sh-session
-go run main.go
+make run
 ```
 
 # Used Technology
