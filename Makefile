@@ -19,7 +19,8 @@ build: setup clean
 
 # This will run golangci-lint
 lint:
-	@echo "linting using golang-ci lint BUT NOT YET IMPLEMENTED"
+	@echo "linting using golang-ci lint"
+	go run github.com/golangci/golangci-lint/cmd/golangci-lint@v1.49.0 run
 
 # This will run all the tests.
 test:
