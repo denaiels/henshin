@@ -21,10 +21,8 @@ func TestInsertionAndRetrieval(t *testing.T) {
 	userUUId := "e0dba740-fc4b-4977-872c-d360239e6b1a"
 	shortUrl := "Jsz4k57oAX"
 
-	// Persist data mapping
 	SaveUrlMapping(shortUrl, initialUrl, userUUId)
 
-	// Retrieve initial Url
 	retrievedUrl := RetrieveInitialUrl(shortUrl)
 
 	assert.Equal(t, initialUrl, retrievedUrl)
