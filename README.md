@@ -70,3 +70,10 @@ Go programming language.
 Redis as store mechanism for super fast data retrieval.
 
 https://golangci-lint.run/ -> fast, lots of linters (no need to install), integrate with VSCode, etc.
+
+Hashing using SHA256 because it doesn't have any known vulnerabilities that make it insecure and it has not been “broken” unlike some other popular hashing algorithms. SHA256 shortens the input data into a smaller form that cannot be understood by using bitwise operations, modular additions, and compression functions.
+
+Encoding using BASE58 instead of BASE64 because:
+- The characters 0,O, I, l are highly confusing when used in certain fonts and are even quite harder to differentiate for people with visuality issues.
+- Removing ponctuations characters prevent confusion for line breakers.
+- Double-clicking selects the whole number as one word if it's all alphanumeric.
