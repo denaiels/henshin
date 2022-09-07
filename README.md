@@ -59,6 +59,8 @@ To run the service, please run the following commands:
 
 ```sh-session
 make run
+# OR
+./bin/url-blaster
 ```
 
 # Used Technology
