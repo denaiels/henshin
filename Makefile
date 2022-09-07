@@ -10,6 +10,7 @@ clean:
 	@echo "cleaning..."
 	rm -rf bin
 	go mod tidy
+	@echo "cleaning done"
 
 # This will generate an executable in ./out directory.
 build: setup clean
@@ -31,7 +32,12 @@ test:
 # This will run the service 
 run: build
 	@echo "running..."
-	go run main.go
+	./bin/url-blaster
 
 # This will run CI
 ci: build lint
+
+# This will run the entire process from building, running, to cleaning again
+run.all:
+	make run
+	make clean
