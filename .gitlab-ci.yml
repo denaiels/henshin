@@ -1,18 +1,16 @@
+image: "artifactory-gojek.golabs.io:6555/cx-go:1.17"
+
 stages:
   - compile
   - test
 
 build:
   stage: compile
-  image: golang:1.18
-  before_script:
-    - apt-get update && apt-get install make
   script:
     - make ci
 
 test:
   stage: test
-  image: golang:1.18
   script:
     - make test
     - make clean

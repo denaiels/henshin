@@ -29,7 +29,7 @@ test:
 	go test
 
 # This will run the service 
-run:
+run: build
 	@echo "running..."
 	go run main.go
 

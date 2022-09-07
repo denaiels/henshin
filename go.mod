@@ -1,3 +1,3 @@
 module source.golabs.io/daniel.santoso/url-blaster
 
-go 1.18
+go 1.17
