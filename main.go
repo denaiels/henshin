@@ -4,6 +4,8 @@ import (
 	"fmt"
 
 	"github.com/gin-gonic/gin"
+	"source.golabs.io/daniel.santoso/url-blaster/handler"
+	"source.golabs.io/daniel.santoso/url-blaster/store"
 )
 
 func main() {
@@ -13,6 +15,16 @@ func main() {
 			"message": "This is the Go URL Blaster!",
 		})
 	})
+
+	router.POST("/create-short-url", func(c *gin.Context) {
+		handler.CreateShortUrl(c)
+	})
+
+	router.GET("/:shortUrl", func(c *gin.Context) {
+		handler.HandleShortUrlRedirect(c)
+	})
+
+	store.InitializeStore()
 
 	err := StartWebServer(router, "9808")
 	if err != nil {
