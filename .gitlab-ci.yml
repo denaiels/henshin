@@ -1,0 +1,16 @@
+image: "artifactory-gojek.golabs.io:6555/cx-go:1.18"
+
+stages:
+  - compile
+  - test
+
+build:
+  stage: compile
+  script:
+    - make ci
+
+test:
+  stage: test
+  script:
+    - make test
+    - make clean
