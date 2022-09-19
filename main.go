@@ -5,10 +5,14 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"source.golabs.io/daniel.santoso/url-blaster/handler"
+	"source.golabs.io/daniel.santoso/url-blaster/shortener"
 	"source.golabs.io/daniel.santoso/url-blaster/store"
 )
 
 func main() {
+	shortener := shortener.NewShortener()
+	handler := handler.NewHandler(shortener)
+
 	router := gin.Default()
 	router.GET("/", func(c *gin.Context) {
 		c.JSON(200, gin.H{

@@ -5,9 +5,21 @@ import (
 	"fmt"
 	"math/big"
 	"os"
+	"strings"
 
 	"github.com/itchyny/base58-go"
 )
+
+type ShortenerI interface {
+	GenerateShortLink(initialUrl string, userId string) (string, error)
+}
+
+type shortener struct {
+}
+
+func NewShortener() ShortenerI {
+	return &shortener{}
+}
 
 func sha2560f(input string) []byte {
 	algorithm := sha256.New()
@@ -25,9 +37,12 @@ func base58Encoded(bytes []byte) string {
 	return string(encoded)
 }
 
-func GenerateShortLink(initialUrl string, userId string) string {
+func (s *shortener) GenerateShortLink(initialUrl string, userId string) (string, error) {
+	if !strings.HasPrefix(initialUrl, "https://") {
+		return "", fmt.Errorf("invalid url! please input a valid url")
+	}
 	urlHashBytes := sha2560f(initialUrl + userId)
 	generatedNumber := new(big.Int).SetBytes(urlHashBytes).Uint64()
 	finalString := base58Encoded([]byte(fmt.Sprintf("%d", generatedNumber)))
-	return finalString[:8]
+	return finalString[:8], nil
 }

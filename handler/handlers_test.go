@@ -1,4 +1,4 @@
-package handler
+package handler_test
 
 import (
 	"bytes"
@@ -10,10 +10,18 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/suite"
+	"source.golabs.io/daniel.santoso/url-blaster/handler"
+	"source.golabs.io/daniel.santoso/url-blaster/shortener"
 	"source.golabs.io/daniel.santoso/url-blaster/store"
 )
 
-func MockJSONPost(c *gin.Context, urlCreationRequest UrlCreationRequest) {
+type handlerSuite struct {
+	suite.Suite
+	urlCreationRequest *handler.UrlCreationRequest
+}
+
+func MockJSONPost(c *gin.Context, urlCreationRequest handler.UrlCreationRequest) {
 	c.Request.Method = "POST"
 	c.Request.Header.Set("Content-Type", "application/json")
 
@@ -25,7 +33,9 @@ func MockJSONPost(c *gin.Context, urlCreationRequest UrlCreationRequest) {
 	c.Request.Body = io.NopCloser(bytes.NewBuffer(jsonbytes))
 }
 
-func TestCreatingShortUrl(t *testing.T) {
+func TestCreateShortUrl(t *testing.T) {
+	shortener := shortener.NewShortener()
+	h := handler.NewHandler(shortener)
 	w := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(w)
 
@@ -33,12 +43,12 @@ func TestCreatingShortUrl(t *testing.T) {
 		Header: make(http.Header),
 	}
 
-	MockJSONPost(c, UrlCreationRequest{
+	MockJSONPost(c, handler.UrlCreationRequest{
 		LongUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
 		UserId:  "e0dba740-fc4b-4977-872c-d360239e6b10",
 	})
 
 	store.InitializeStore()
-	CreateShortUrl(c)
+	h.CreateShortUrl(c)
 	assert.Equal(t, http.StatusOK, w.Code)
 }
