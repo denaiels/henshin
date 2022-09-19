@@ -10,16 +10,10 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/suite"
 	"source.golabs.io/daniel.santoso/url-blaster/handler"
 	"source.golabs.io/daniel.santoso/url-blaster/shortener"
 	"source.golabs.io/daniel.santoso/url-blaster/store"
 )
-
-type handlerSuite struct {
-	suite.Suite
-	urlCreationRequest *handler.UrlCreationRequest
-}
 
 func MockJSONPost(c *gin.Context, urlCreationRequest handler.UrlCreationRequest) {
 	c.Request.Method = "POST"
