@@ -1,9 +1,11 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"source.golabs.io/daniel.santoso/url-blaster/config"
 	"source.golabs.io/daniel.santoso/url-blaster/shortener"
 	"source.golabs.io/daniel.santoso/url-blaster/store"
 )
@@ -15,6 +17,8 @@ type HandlerI interface {
 
 type handler struct {
 	shortener shortener.ShortenerI
+	cfg       config.Config
+	store     store.StorageServiceI
 }
 
 type UrlCreationRequest struct {
@@ -22,9 +26,11 @@ type UrlCreationRequest struct {
 	UserId  string `json:"user_id" binding:"required"`
 }
 
-func NewHandler(shortener shortener.ShortenerI) HandlerI {
+func NewHandler(shortener shortener.ShortenerI, cfg config.Config, store store.StorageServiceI) HandlerI {
 	return &handler{
 		shortener: shortener,
+		cfg:       cfg,
+		store:     store,
 	}
 }
 
@@ -39,9 +45,9 @@ func (h *handler) CreateShortUrl(c *gin.Context) {
 	if err != nil {
 		return
 	}
-	store.SaveUrlMapping(shortUrl, creationRequest.LongUrl, creationRequest.UserId)
+	h.store.SaveUrlMapping(shortUrl, creationRequest.LongUrl, creationRequest.UserId)
 
-	host := "http://localhost:9808/"
+	host := fmt.Sprintf("http://%s:%s/", h.cfg.Host, h.cfg.ServerPort)
 	c.JSON(200, gin.H{
 		"message":   "short url created successfully",
 		"short_url": host + shortUrl,
@@ -50,6 +56,6 @@ func (h *handler) CreateShortUrl(c *gin.Context) {
 
 func (h *handler) HandleShortUrlRedirect(c *gin.Context) {
 	shortUrl := c.Param("shortUrl")
-	initialUrl := store.RetrieveInitialUrl(shortUrl)
+	initialUrl := h.store.RetrieveInitialUrl(shortUrl)
 	c.Redirect(302, initialUrl)
 }

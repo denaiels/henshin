@@ -2,6 +2,7 @@ package handler_test
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"io"
 	"net/http"
@@ -10,6 +11,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
+	"source.golabs.io/daniel.santoso/url-blaster/config"
 	"source.golabs.io/daniel.santoso/url-blaster/handler"
 	"source.golabs.io/daniel.santoso/url-blaster/shortener"
 	"source.golabs.io/daniel.santoso/url-blaster/store"
@@ -29,7 +31,10 @@ func MockJSONPost(c *gin.Context, urlCreationRequest handler.UrlCreationRequest)
 
 func TestCreateShortUrl(t *testing.T) {
 	shortener := shortener.NewShortener()
-	h := handler.NewHandler(shortener)
+	cfg := config.NewConfig("../dev.application.yml")
+	ctx := context.Background()
+	store := store.NewStorageService(cfg, ctx)
+	h := handler.NewHandler(shortener, cfg, store)
 	w := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(w)
 
@@ -42,7 +47,7 @@ func TestCreateShortUrl(t *testing.T) {
 		UserId:  "e0dba740-fc4b-4977-872c-d360239e6b10",
 	})
 
-	store.InitializeStore()
+	// store.InitializeRedis()
 	h.CreateShortUrl(c)
 	assert.Equal(t, http.StatusOK, w.Code)
 }

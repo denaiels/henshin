@@ -6,22 +6,37 @@ import (
 	"time"
 
 	"github.com/go-redis/redis/v8"
+	"source.golabs.io/daniel.santoso/url-blaster/config"
 )
+
+type StorageServiceI interface {
+	SaveUrlMapping(shortUrl string, originalUrl string, userId string)
+	RetrieveInitialUrl(shortUrl string) string
+}
 
 type StorageService struct {
 	redisClient *redis.Client
+	cfg         config.Config
+	ctx         context.Context
 }
-
-var (
-	storeService = &StorageService{}
-	ctx          = context.Background()
-)
 
 const CacheDuration = 6 * time.Hour
 
-func InitializeStore() *StorageService {
+func NewStorageService(cfg config.Config, ctx context.Context) StorageServiceI {
+	redisClient := initializeRedis(cfg, ctx)
+
+	return &StorageService{
+		redisClient: redisClient,
+		cfg:         cfg,
+		ctx:         ctx,
+	}
+}
+
+func initializeRedis(cfg config.Config, ctx context.Context) *redis.Client {
+	address := fmt.Sprintf("%s:%s", cfg.Host, cfg.StoragePort)
+
 	redisClient := redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
+		Addr:     address,
 		Password: "",
 		DB:       0,
 	})
@@ -32,19 +47,18 @@ func InitializeStore() *StorageService {
 	}
 
 	fmt.Printf("\nRedis started successfully: pong message = {%s}", pong)
-	storeService.redisClient = redisClient
-	return storeService
+	return redisClient
 }
 
-func SaveUrlMapping(shortUrl string, originalUrl string, userId string) {
-	err := storeService.redisClient.Set(ctx, shortUrl, originalUrl, CacheDuration).Err()
+func (s *StorageService) SaveUrlMapping(shortUrl string, originalUrl string, userId string) {
+	err := s.redisClient.Set(s.ctx, shortUrl, originalUrl, CacheDuration).Err()
 	if err != nil {
 		panic(fmt.Sprintf("Failed saving key url | Error: %v - shortUrl: %s - originalUrl: %s\n", err, shortUrl, originalUrl))
 	}
 }
 
-func RetrieveInitialUrl(shortUrl string) string {
-	result, err := storeService.redisClient.Get(ctx, shortUrl).Result()
+func (s *StorageService) RetrieveInitialUrl(shortUrl string) string {
+	result, err := s.redisClient.Get(s.ctx, shortUrl).Result()
 	if err != nil {
 		panic(fmt.Sprintf("Failed retrieving inital url | Error: %v - shortUrl: %s\n", err, shortUrl))
 	}
