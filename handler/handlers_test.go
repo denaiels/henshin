@@ -47,7 +47,6 @@ func TestCreateShortUrl(t *testing.T) {
 		UserId:  "e0dba740-fc4b-4977-872c-d360239e6b10",
 	})
 
-	// store.InitializeRedis()
 	h.CreateShortUrl(c)
 	assert.Equal(t, http.StatusOK, w.Code)
 }
