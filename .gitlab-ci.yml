@@ -6,6 +6,9 @@ stages:
 
 build:
   stage: compile
+  services:
+    - name: artifactory-gojek.golabs.io:6555/grokzen/redis-cluster:latest
+      alias: redis-cluster
   script:
     - make ci
 
