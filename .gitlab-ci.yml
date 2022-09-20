@@ -7,7 +7,7 @@ stages:
 build:
   stage: compile
   script:
-    - apt-get update && apt-get install redis
+    - apt-get update && apt-get install redis-server
     - make ci
 
 test:
