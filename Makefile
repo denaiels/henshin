@@ -15,7 +15,6 @@ clean:
 # This will generate an executable in ./out directory.
 build: setup clean
 	@echo "building..."
-	yes | apt-get update && apt-get install redis-server
 	mkdir -p bin
 	go build -o bin/url-blaster -v .
 
