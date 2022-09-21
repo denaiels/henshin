@@ -10,14 +10,13 @@ import (
 )
 
 type StorageServiceI interface {
-	SaveUrlMapping(shortUrl string, originalUrl string, userId string)
-	RetrieveInitialUrl(shortUrl string) string
+	SaveUrlMapping(ctx context.Context, shortUrl, originalUrl, userId string)
+	RetrieveInitialUrl(ctx context.Context, shortUrl string) string
 }
 
 type StorageService struct {
-	redisClient *redis.Client
-	cfg         *config.Config
-	ctx         context.Context
+	Cfg         *config.Config
+	RedisClient *redis.Client
 }
 
 const CacheDuration = 6 * time.Hour
@@ -26,9 +25,8 @@ func NewStorageService(cfg *config.Config, ctx context.Context) StorageServiceI 
 	redisClient := initializeRedis(cfg, ctx)
 
 	return &StorageService{
-		redisClient: redisClient,
-		cfg:         cfg,
-		ctx:         ctx,
+		Cfg:         cfg,
+		RedisClient: redisClient,
 	}
 }
 
@@ -50,15 +48,15 @@ func initializeRedis(cfg *config.Config, ctx context.Context) *redis.Client {
 	return redisClient
 }
 
-func (s *StorageService) SaveUrlMapping(shortUrl string, originalUrl string, userId string) {
-	err := s.redisClient.Set(s.ctx, shortUrl, originalUrl, CacheDuration).Err()
+func (s *StorageService) SaveUrlMapping(ctx context.Context, shortUrl, originalUrl, userId string) {
+	err := s.RedisClient.Set(ctx, shortUrl, originalUrl, CacheDuration).Err()
 	if err != nil {
 		panic(fmt.Sprintf("Failed saving key url | Error: %v - shortUrl: %s - originalUrl: %s\n", err, shortUrl, originalUrl))
 	}
 }
 
-func (s *StorageService) RetrieveInitialUrl(shortUrl string) string {
-	result, err := s.redisClient.Get(s.ctx, shortUrl).Result()
+func (s *StorageService) RetrieveInitialUrl(ctx context.Context, shortUrl string) string {
+	result, err := s.RedisClient.Get(ctx, shortUrl).Result()
 	if err != nil {
 		panic(fmt.Sprintf("Failed retrieving inital url | Error: %v - shortUrl: %s\n", err, shortUrl))
 	}

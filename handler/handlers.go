@@ -45,7 +45,7 @@ func (h *handler) CreateShortUrl(c *gin.Context) {
 	if err != nil {
 		return
 	}
-	h.store.SaveUrlMapping(shortUrl, creationRequest.LongUrl, creationRequest.UserId)
+	h.store.SaveUrlMapping(c, shortUrl, creationRequest.LongUrl, creationRequest.UserId)
 
 	host := fmt.Sprintf("http://%s:%s/", h.cfg.ServerHost, h.cfg.ServerPort)
 	c.JSON(200, gin.H{
@@ -56,6 +56,6 @@ func (h *handler) CreateShortUrl(c *gin.Context) {
 
 func (h *handler) HandleShortUrlRedirect(c *gin.Context) {
 	shortUrl := c.Param("shortUrl")
-	initialUrl := h.store.RetrieveInitialUrl(shortUrl)
+	initialUrl := h.store.RetrieveInitialUrl(c, shortUrl)
 	c.Redirect(302, initialUrl)
 }

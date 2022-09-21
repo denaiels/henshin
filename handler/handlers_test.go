@@ -2,14 +2,15 @@ package handler_test
 
 import (
 	"bytes"
-	"context"
 	"encoding/json"
 	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
+	"github.com/alicebob/miniredis/v2"
 	"github.com/gin-gonic/gin"
+	"github.com/go-redis/redis/v8"
 	"github.com/stretchr/testify/assert"
 	"source.golabs.io/daniel.santoso/url-blaster/config"
 	"source.golabs.io/daniel.santoso/url-blaster/handler"
@@ -31,13 +32,19 @@ func MockJSONPost(c *gin.Context, urlCreationRequest handler.UrlCreationRequest)
 
 func TestCreateShortUrl(t *testing.T) {
 	shortener := shortener.NewShortener()
-	cfg, err := config.NewConfig("../dev.application.yml")
+	cfg, err := config.NewConfig("../test.application.yml")
 	if err != nil {
 		return
 	}
-	ctx := context.Background()
-	store := store.NewStorageService(cfg, ctx)
-	h := handler.NewHandler(shortener, cfg, store)
+	redisServer := miniredis.RunT(t)
+	redisClient := redis.NewClient(&redis.Options{
+		Addr: redisServer.Addr(),
+	})
+
+	storageService := store.StorageService{
+		RedisClient: redisClient,
+	}
+	h := handler.NewHandler(shortener, cfg, &storageService)
 	w := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(w)
 
