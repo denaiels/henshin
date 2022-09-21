@@ -14,6 +14,8 @@ stages:
 
 build:
   stage: compile
+  before_script:
+    - git config --global url."https://source.golabs.io/".insteadOf git@source.golabs.io":"
   script:
     - make ci
 
