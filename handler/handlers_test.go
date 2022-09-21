@@ -31,7 +31,10 @@ func MockJSONPost(c *gin.Context, urlCreationRequest handler.UrlCreationRequest)
 
 func TestCreateShortUrl(t *testing.T) {
 	shortener := shortener.NewShortener()
-	cfg := config.NewConfig("../dev.application.yml")
+	cfg, err := config.NewConfig("../dev.application.yml")
+	if err != nil {
+		return
+	}
 	ctx := context.Background()
 	store := store.NewStorageService(cfg, ctx)
 	h := handler.NewHandler(shortener, cfg, store)

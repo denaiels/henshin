@@ -13,7 +13,7 @@ import (
 
 func main() {
 	shortener := shortener.NewShortener()
-	cfg := config.NewConfig("dev.application.yml")
+	cfg, err := config.NewConfig("dev.application.yml")
 	ctx := context.Background()
 	store := store.NewStorageService(cfg, ctx)
 	handler := handler.NewHandler(shortener, cfg, store)
@@ -33,7 +33,7 @@ func main() {
 		handler.HandleShortUrlRedirect(c)
 	})
 
-	err := StartWebServer(router, cfg.ServerPort)
+	err = StartWebServer(router, cfg.ServerPort)
 	if err != nil {
 		panic(fmt.Sprintf("Failed to start the web server - Error %v", err))
 	}

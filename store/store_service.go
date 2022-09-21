@@ -16,13 +16,13 @@ type StorageServiceI interface {
 
 type StorageService struct {
 	redisClient *redis.Client
-	cfg         config.Config
+	cfg         *config.Config
 	ctx         context.Context
 }
 
 const CacheDuration = 6 * time.Hour
 
-func NewStorageService(cfg config.Config, ctx context.Context) StorageServiceI {
+func NewStorageService(cfg *config.Config, ctx context.Context) StorageServiceI {
 	redisClient := initializeRedis(cfg, ctx)
 
 	return &StorageService{
@@ -32,7 +32,7 @@ func NewStorageService(cfg config.Config, ctx context.Context) StorageServiceI {
 	}
 }
 
-func initializeRedis(cfg config.Config, ctx context.Context) *redis.Client {
+func initializeRedis(cfg *config.Config, ctx context.Context) *redis.Client {
 	address := fmt.Sprintf("%s:%s", cfg.StorageHost, cfg.StoragePort)
 
 	redisClient := redis.NewClient(&redis.Options{

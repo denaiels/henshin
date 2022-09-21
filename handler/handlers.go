@@ -17,7 +17,7 @@ type HandlerI interface {
 
 type handler struct {
 	shortener shortener.ShortenerI
-	cfg       config.Config
+	cfg       *config.Config
 	store     store.StorageServiceI
 }
 
@@ -26,7 +26,7 @@ type UrlCreationRequest struct {
 	UserId  string `json:"user_id" binding:"required"`
 }
 
-func NewHandler(shortener shortener.ShortenerI, cfg config.Config, store store.StorageServiceI) HandlerI {
+func NewHandler(shortener shortener.ShortenerI, cfg *config.Config, store store.StorageServiceI) HandlerI {
 	return &handler{
 		shortener: shortener,
 		cfg:       cfg,

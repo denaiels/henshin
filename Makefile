@@ -1,3 +1,5 @@
+GOPRIVATE=source.golabs.io
+
 # This will install all package dependencies
 setup:
 	@echo "installing all required dependencies..."
