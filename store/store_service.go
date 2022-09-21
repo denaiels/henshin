@@ -33,7 +33,7 @@ func NewStorageService(cfg config.Config, ctx context.Context) StorageServiceI {
 }
 
 func initializeRedis(cfg config.Config, ctx context.Context) *redis.Client {
-	address := fmt.Sprintf("%s:%s", cfg.Host, cfg.StoragePort)
+	address := fmt.Sprintf("%s:%s", cfg.StorageHost, cfg.StoragePort)
 
 	redisClient := redis.NewClient(&redis.Options{
 		Addr:     address,

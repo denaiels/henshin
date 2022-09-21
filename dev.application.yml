@@ -1,4 +1,5 @@
 APP_NAME: urlblaster
-HOST: localhost
+SERVER_HOST: localhost
 SERVER_PORT: 9808
+STORAGE_HOST: redis
 STORAGE_PORT: 6379

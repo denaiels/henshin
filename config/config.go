@@ -9,8 +9,9 @@ import (
 
 type Config struct {
 	AppName     string `yaml:"APP_NAME"`
-	Host        string `yaml:"HOST"`
+	ServerHost  string `yaml:"SERVER_HOST"`
 	ServerPort  string `yaml:"SERVER_PORT"`
+	StorageHost string `yaml:"STORAGE_HOST"`
 	StoragePort string `yaml:"STORAGE_PORT"`
 }
 

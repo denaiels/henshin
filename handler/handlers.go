@@ -47,7 +47,7 @@ func (h *handler) CreateShortUrl(c *gin.Context) {
 	}
 	h.store.SaveUrlMapping(shortUrl, creationRequest.LongUrl, creationRequest.UserId)
 
-	host := fmt.Sprintf("http://%s:%s/", h.cfg.Host, h.cfg.ServerPort)
+	host := fmt.Sprintf("http://%s:%s/", h.cfg.ServerHost, h.cfg.ServerPort)
 	c.JSON(200, gin.H{
 		"message":   "short url created successfully",
 		"short_url": host + shortUrl,
