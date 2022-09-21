@@ -14,6 +14,9 @@ import (
 func main() {
 	shortener := shortener.NewShortener()
 	cfg, err := config.NewConfig("dev.application.yml")
+	if err != nil {
+		panic(fmt.Sprintf("Failed to create config - Error %v", err))
+	}
 	ctx := context.Background()
 	store := store.NewStorageService(cfg, ctx)
 	handler := handler.NewHandler(shortener, cfg, store)
