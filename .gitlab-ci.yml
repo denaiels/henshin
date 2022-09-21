@@ -16,6 +16,8 @@ build:
   stage: compile
   before_script:
     - git config --global url."https://source.golabs.io/".insteadOf git@source.golabs.io":"
+    - git config --global credential.helper store
+    - echo "https://gitlab-ci-token:$CI_BUILD_TOKEN@source.golabs.io" > ~/.git-credentials
   script:
     - make ci
 
