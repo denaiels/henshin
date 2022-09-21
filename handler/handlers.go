@@ -16,8 +16,8 @@ type HandlerI interface {
 }
 
 type handler struct {
-	shortener shortener.ShortenerI
 	cfg       *config.Config
+	shortener shortener.ShortenerI
 	store     store.StorageServiceI
 }
 
@@ -28,8 +28,8 @@ type UrlCreationRequest struct {
 
 func NewHandler(shortener shortener.ShortenerI, cfg *config.Config, store store.StorageServiceI) HandlerI {
 	return &handler{
-		shortener: shortener,
 		cfg:       cfg,
+		shortener: shortener,
 		store:     store,
 	}
 }
