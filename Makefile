@@ -4,7 +4,7 @@ export GOPRIVATE
 # This will install all package dependencies
 setup:
 	@echo "installing all required dependencies..."
-	go env -w GOPRIVATE=source.golabs.io/*
+	go env -w GOPRIVATE=source.golabs.io/go-food
 	go mod vendor
 	go mod tidy
 
