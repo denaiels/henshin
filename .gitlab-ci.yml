@@ -1,16 +1,17 @@
 image: "artifactory-gojek.golabs.io:6555/cx-go:1.18"
 
+services:
+  redis:
+    image: artifactory-gojek.golabs.io:6555/grokzen/redis-cluster:latest
+    ports:
+      - "6379:6379"
+
 stages:
   - compile
   - test
 
 build:
   stage: compile
-  services:
-    redis:
-      image: artifactory-gojek.golabs.io:6555/grokzen/redis-cluster:latest
-      ports:
-        - "6379:6379"
   script:
     - make ci
 
