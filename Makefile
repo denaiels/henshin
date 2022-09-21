@@ -1,4 +1,5 @@
 GOPRIVATE=source.golabs.io
+export GOPRIVATE
 
 # This will install all package dependencies
 setup:
