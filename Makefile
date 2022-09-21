@@ -11,7 +11,6 @@ export GOPROXY
 setup:
 	@echo "installing all required dependencies..."
 	go env -w GOPRIVATE=source.golabs.io
-	go get -d -v
 	go mod vendor
 	go mod tidy
 
