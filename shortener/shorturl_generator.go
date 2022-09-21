@@ -31,7 +31,6 @@ func base58Encoded(bytes []byte) string {
 	encoded, err := encoding.Encode(bytes)
 	if err != nil {
 		fmt.Println(err.Error())
-		// os.Exit(1)
 		panic("Failed to encode!!!")
 	}
 	return string(encoded)
