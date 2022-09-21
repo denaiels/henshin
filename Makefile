@@ -3,7 +3,6 @@ GOPRIVATE=source.golabs.io
 # This will install all package dependencies
 setup:
 	@echo "installing all required dependencies..."
-	go get -d -v
 	go mod vendor
 	go mod tidy
 
