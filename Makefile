@@ -1,10 +1,17 @@
+GO111MODULE=on
 GOPRIVATE=source.golabs.io
+GOSUMDB=sum.golang.org
+GOPROXY=proxy.golang.org
+export GO111MODULE
 export GOPRIVATE
+export GOSUMDB
+export GOPROXY
 
 # This will install all package dependencies
 setup:
 	@echo "installing all required dependencies..."
-	go env -w GOPRIVATE=source.golabs.io/go-food
+	go env -w GOPRIVATE=source.golabs.io
+	go get -d -v
 	go mod vendor
 	go mod tidy
 
