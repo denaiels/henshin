@@ -45,7 +45,7 @@ func initializeRedis(cfg *config.Config, ctx context.Context) *redis.Client {
 		log.Panic().Msg(fmt.Sprintf("Error init Redis: %v", err))
 	}
 
-	fmt.Printf("\nRedis started successfully: pong message = {%s}", pong)
+	log.Info().Msg(fmt.Sprintf("\nRedis started successfully: pong message = {%s}", pong))
 	return redisClient
 }
 

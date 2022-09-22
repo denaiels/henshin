@@ -3,6 +3,7 @@ package handler
 import (
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
@@ -42,8 +43,14 @@ func (h *handler) CreateShortUrl(c *gin.Context) {
 		return
 	}
 
+	if !strings.HasPrefix(creationRequest.LongUrl, "https://") {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Please input a valid url!"})
+		return
+	}
+
 	shortUrl, err := h.shortener.GenerateShortLink(creationRequest.LongUrl, creationRequest.UserId)
 	if err != nil {
+		log.Err(err).Msg("Error while generating short link because error while encoding with base58")
 		return
 	}
 
@@ -61,14 +68,13 @@ func (h *handler) CreateShortUrl(c *gin.Context) {
 
 func (h *handler) HandleShortUrlRedirect(c *gin.Context) {
 	shortUrl := c.Param("shortUrl")
-	println(shortUrl)
 	initialUrl, err := h.store.RetrieveInitialUrl(c, shortUrl)
 	if err != nil {
 		log.Err(err).Msg(fmt.Sprintf("Failed retrieving inital url | Error: %v - shortUrl: %s", err, shortUrl))
 		c.JSON(404, gin.H{
 			"message": "Something's wrong, i can feel it... Maybe you entered the wrong link.",
 		})
-		c.Redirect(500, initialUrl)
+		return
 	}
 	c.Redirect(302, initialUrl)
 }

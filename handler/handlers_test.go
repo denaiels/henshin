@@ -19,6 +19,8 @@ import (
 	"source.golabs.io/daniel.santoso/url-blaster/store"
 )
 
+const UserId = "e0dba740-fc4b-4977-872c-d360239e6b1a"
+
 func MockJSONPost(c *gin.Context, urlCreationRequest handler.UrlCreationRequest) {
 	c.Request.Method = "POST"
 	c.Request.Header.Set("Content-Type", "application/json")
@@ -31,7 +33,7 @@ func MockJSONPost(c *gin.Context, urlCreationRequest handler.UrlCreationRequest)
 	c.Request.Body = io.NopCloser(bytes.NewBuffer(jsonbytes))
 }
 
-func TestCreateShortUrl(t *testing.T) {
+func TestCreateShortUrlSuccess(t *testing.T) {
 	shortener := shortener.NewShortener()
 	cfg, err := config.NewConfig("../test.application.yml")
 	assert.NoError(t, err)
@@ -59,4 +61,34 @@ func TestCreateShortUrl(t *testing.T) {
 	h.CreateShortUrl(c)
 
 	assert.Equal(t, http.StatusOK, w.Code)
+}
+
+func TestCreateShortUrlWithInvalidLink(t *testing.T) {
+	shortener := shortener.NewShortener()
+	cfg, err := config.NewConfig("../test.application.yml")
+	assert.NoError(t, err)
+	redisServer := miniredis.RunT(t)
+	redisClient := redis.NewClient(&redis.Options{
+		Addr: redisServer.Addr(),
+	})
+
+	storageService := store.StorageService{
+		RedisClient: redisClient,
+	}
+	h := handler.NewHandler(shortener, cfg, &storageService)
+	w := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(w)
+
+	c.Request = &http.Request{
+		Header: make(http.Header),
+	}
+
+	MockJSONPost(c, handler.UrlCreationRequest{
+		LongUrl: "hahaha",
+		UserId:  "e0dba740-fc4b-4977-872c-d360239e6b10",
+	})
+
+	h.CreateShortUrl(c)
+
+	assert.Equal(t, http.StatusBadRequest, w.Code)
 }

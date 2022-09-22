@@ -38,13 +38,3 @@ func TestShortLinkGeneratorWithWikiLink(t *testing.T) {
 	assert.Equal(t, "Y6edurWL", shortUrl3)
 	assert.NoError(t, err)
 }
-
-func TestShortLinkGeneratorWithInvalidLink(t *testing.T) {
-	s := shortener.NewShortener()
-
-	initialUrl := "hahaha"
-	shortUrl, err := s.GenerateShortLink(initialUrl, UserId)
-
-	assert.Equal(t, shortUrl, "")
-	assert.NotNil(t, err)
-}

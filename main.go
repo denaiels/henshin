@@ -29,13 +29,9 @@ func main() {
 		})
 	})
 
-	router.POST("/create-short-url", func(c *gin.Context) {
-		handler.CreateShortUrl(c)
-	})
+	router.POST("/create-short-url", handler.CreateShortUrl)
 
-	router.GET("/:shortUrl", func(c *gin.Context) {
-		handler.HandleShortUrlRedirect(c)
-	})
+	router.GET("/:shortUrl", handler.HandleShortUrlRedirect)
 
 	err = StartWebServer(router, cfg.ServerPort)
 	if err != nil {
