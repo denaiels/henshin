@@ -11,6 +11,7 @@ import (
 	"github.com/alicebob/miniredis/v2"
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis/v8"
+	"github.com/rs/zerolog/log"
 	"github.com/stretchr/testify/assert"
 	"source.golabs.io/daniel.santoso/url-blaster/config"
 	"source.golabs.io/daniel.santoso/url-blaster/handler"
@@ -24,7 +25,7 @@ func MockJSONPost(c *gin.Context, urlCreationRequest handler.UrlCreationRequest)
 
 	jsonbytes, err := json.Marshal(urlCreationRequest)
 	if err != nil {
-		panic(err)
+		log.Err(err).Msg("Error while mocking JSON post")
 	}
 
 	c.Request.Body = io.NopCloser(bytes.NewBuffer(jsonbytes))
@@ -33,9 +34,7 @@ func MockJSONPost(c *gin.Context, urlCreationRequest handler.UrlCreationRequest)
 func TestCreateShortUrl(t *testing.T) {
 	shortener := shortener.NewShortener()
 	cfg, err := config.NewConfig("../test.application.yml")
-	if err != nil {
-		return
-	}
+	assert.NoError(t, err)
 	redisServer := miniredis.RunT(t)
 	redisClient := redis.NewClient(&redis.Options{
 		Addr: redisServer.Addr(),
@@ -58,5 +57,6 @@ func TestCreateShortUrl(t *testing.T) {
 	})
 
 	h.CreateShortUrl(c)
+
 	assert.Equal(t, http.StatusOK, w.Code)
 }

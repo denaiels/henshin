@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/gin-gonic/gin"
+	"github.com/rs/zerolog/log"
 	"source.golabs.io/daniel.santoso/url-blaster/config"
 	"source.golabs.io/daniel.santoso/url-blaster/handler"
 	"source.golabs.io/daniel.santoso/url-blaster/shortener"
@@ -15,7 +16,7 @@ func main() {
 	shortener := shortener.NewShortener()
 	cfg, err := config.NewConfig("dev.application.yml")
 	if err != nil {
-		panic(fmt.Sprintf("Failed to create config - Error %v", err))
+		log.Err(err).Msg("Error while loading config")
 	}
 	ctx := context.Background()
 	store := store.NewStorageService(cfg, ctx)
@@ -38,7 +39,7 @@ func main() {
 
 	err = StartWebServer(router, cfg.ServerPort)
 	if err != nil {
-		panic(fmt.Sprintf("Failed to start the web server - Error %v", err))
+		log.Panic().Msg(fmt.Sprintf("Failed to start the web server - Error %v", err))
 	}
 }
 

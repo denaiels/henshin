@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/rs/zerolog/log"
 	"source.golabs.io/daniel.santoso/url-blaster/config"
 	"source.golabs.io/daniel.santoso/url-blaster/shortener"
 	"source.golabs.io/daniel.santoso/url-blaster/store"
@@ -45,7 +46,11 @@ func (h *handler) CreateShortUrl(c *gin.Context) {
 	if err != nil {
 		return
 	}
-	h.store.SaveUrlMapping(c, shortUrl, creationRequest.LongUrl, creationRequest.UserId)
+
+	err = h.store.SaveUrlMapping(c, shortUrl, creationRequest.LongUrl, creationRequest.UserId)
+	if err != nil {
+		log.Err(err).Msg(fmt.Sprintf("Failed saving key url | Error: %v - shortUrl: %s - originalUrl: %s", err, shortUrl, creationRequest.LongUrl))
+	}
 
 	host := fmt.Sprintf("http://%s:%s/", h.cfg.ServerHost, h.cfg.ServerPort)
 	c.JSON(200, gin.H{
@@ -56,6 +61,14 @@ func (h *handler) CreateShortUrl(c *gin.Context) {
 
 func (h *handler) HandleShortUrlRedirect(c *gin.Context) {
 	shortUrl := c.Param("shortUrl")
-	initialUrl := h.store.RetrieveInitialUrl(c, shortUrl)
+	println(shortUrl)
+	initialUrl, err := h.store.RetrieveInitialUrl(c, shortUrl)
+	if err != nil {
+		log.Err(err).Msg(fmt.Sprintf("Failed retrieving inital url | Error: %v - shortUrl: %s", err, shortUrl))
+		c.JSON(404, gin.H{
+			"message": "Something's wrong, i can feel it... Maybe you entered the wrong link.",
+		})
+		c.Redirect(500, initialUrl)
+	}
 	c.Redirect(302, initialUrl)
 }

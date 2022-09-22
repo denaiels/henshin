@@ -6,12 +6,13 @@ import (
 	"time"
 
 	"github.com/go-redis/redis/v8"
+	"github.com/rs/zerolog/log"
 	"source.golabs.io/daniel.santoso/url-blaster/config"
 )
 
 type StorageServiceI interface {
-	SaveUrlMapping(ctx context.Context, shortUrl, originalUrl, userId string)
-	RetrieveInitialUrl(ctx context.Context, shortUrl string) string
+	SaveUrlMapping(ctx context.Context, shortUrl, originalUrl, userId string) error
+	RetrieveInitialUrl(ctx context.Context, shortUrl string) (string, error)
 }
 
 type StorageService struct {
@@ -41,24 +42,26 @@ func initializeRedis(cfg *config.Config, ctx context.Context) *redis.Client {
 
 	pong, err := redisClient.Ping(ctx).Result()
 	if err != nil {
-		panic(fmt.Sprintf("Error init Redis: %v", err))
+		log.Panic().Msg(fmt.Sprintf("Error init Redis: %v", err))
 	}
 
 	fmt.Printf("\nRedis started successfully: pong message = {%s}", pong)
 	return redisClient
 }
 
-func (s *StorageService) SaveUrlMapping(ctx context.Context, shortUrl, originalUrl, userId string) {
+func (s *StorageService) SaveUrlMapping(ctx context.Context, shortUrl, originalUrl, userId string) error {
 	err := s.RedisClient.Set(ctx, shortUrl, originalUrl, CacheDuration).Err()
 	if err != nil {
-		panic(fmt.Sprintf("Failed saving key url | Error: %v - shortUrl: %s - originalUrl: %s\n", err, shortUrl, originalUrl))
+		return err
 	}
+
+	return nil
 }
 
-func (s *StorageService) RetrieveInitialUrl(ctx context.Context, shortUrl string) string {
+func (s *StorageService) RetrieveInitialUrl(ctx context.Context, shortUrl string) (string, error) {
 	result, err := s.RedisClient.Get(ctx, shortUrl).Result()
 	if err != nil {
-		panic(fmt.Sprintf("Failed retrieving inital url | Error: %v - shortUrl: %s\n", err, shortUrl))
+		return "", err
 	}
-	return result
+	return result, nil
 }

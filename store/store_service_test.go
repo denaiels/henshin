@@ -23,7 +23,9 @@ func TestStoreInit(t *testing.T) {
 	cfg.StorageHost = address[0]
 	cfg.StoragePort = address[1]
 	ctx := context.Background()
+
 	store := store.NewStorageService(cfg, ctx)
+
 	assert.True(t, store != nil)
 }
 
@@ -42,9 +44,12 @@ func TestInsertionAndRetrieval(t *testing.T) {
 	userUUId := "e0dba740-fc4b-4977-872c-d360239e6b1a"
 	shortUrl := "Jsz4k57oAX"
 
-	storageService.SaveUrlMapping(ctx, shortUrl, initialUrl, userUUId)
+	err := storageService.SaveUrlMapping(ctx, shortUrl, initialUrl, userUUId)
+	assert.NoError(t, err)
 
-	retrievedUrl := storageService.RetrieveInitialUrl(ctx, shortUrl)
+	retrievedUrl, err := storageService.RetrieveInitialUrl(ctx, shortUrl)
+	assert.NoError(t, err)
 
 	assert.Equal(t, initialUrl, retrievedUrl)
+	assert.NoError(t, err)
 }

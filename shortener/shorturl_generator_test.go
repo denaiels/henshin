@@ -16,7 +16,7 @@ func TestShortLinkGeneratorWithYouTubeLink(t *testing.T) {
 	shortUrl1, err := s.GenerateShortLink(initialUrl1, UserId)
 
 	assert.Equal(t, "ASzHLChJ", shortUrl1)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 }
 
 func TestShortLinkGeneratorWithGojekLink(t *testing.T) {
@@ -26,7 +26,7 @@ func TestShortLinkGeneratorWithGojekLink(t *testing.T) {
 	shortUrl2, err := s.GenerateShortLink(initialUrl2, UserId)
 
 	assert.Equal(t, "aSLo122q", shortUrl2)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 }
 
 func TestShortLinkGeneratorWithWikiLink(t *testing.T) {
@@ -36,7 +36,7 @@ func TestShortLinkGeneratorWithWikiLink(t *testing.T) {
 	shortUrl3, err := s.GenerateShortLink(initialUrl3, UserId)
 
 	assert.Equal(t, "Y6edurWL", shortUrl3)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 }
 
 func TestShortLinkGeneratorWithInvalidLink(t *testing.T) {
