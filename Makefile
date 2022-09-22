@@ -25,7 +25,7 @@ clean:
 build: setup clean
 	@echo "building..."
 	mkdir -p bin
-	go build -o bin/url-blaster -v .
+	go build -o bin/url-blaster -v cmd/url-blaster/main.go
 
 # This will run golangci-lint
 lint:
