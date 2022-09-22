@@ -31,6 +31,10 @@ func main() {
 
 	router.POST("/create-short-url", handler.CreateShortUrl)
 
+	router.POST("/update-url", handler.UpdateLongUrl)
+
+	router.POST("/remove-url", handler.RemoveShortUrl)
+
 	router.GET("/:shortUrl", handler.HandleShortUrlRedirect)
 
 	err = StartWebServer(router, cfg.ServerPort)
