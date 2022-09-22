@@ -2,11 +2,13 @@ package handler_test
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/alicebob/miniredis/v2"
 	"github.com/gin-gonic/gin"
@@ -20,6 +22,7 @@ import (
 )
 
 const UserId = "e0dba740-fc4b-4977-872c-d360239e6b1a"
+const CacheDuration = 6 * time.Hour
 
 func MockJSONPost(c *gin.Context, urlCreationRequest handler.UrlCreationRequest) {
 	c.Request.Method = "POST"
@@ -63,6 +66,66 @@ func TestCreateShortUrlSuccess(t *testing.T) {
 	assert.Equal(t, http.StatusOK, w.Code)
 }
 
+func TestCreateShortUrlEmptyUrl(t *testing.T) {
+	shortener := shortener.NewShortener()
+	cfg, err := config.NewConfig("../test.application.yml")
+	assert.NoError(t, err)
+	redisServer := miniredis.RunT(t)
+	redisClient := redis.NewClient(&redis.Options{
+		Addr: redisServer.Addr(),
+	})
+
+	storageService := store.StorageService{
+		RedisClient: redisClient,
+	}
+	h := handler.NewHandler(shortener, cfg, &storageService)
+	w := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(w)
+
+	c.Request = &http.Request{
+		Header: make(http.Header),
+	}
+
+	MockJSONPost(c, handler.UrlCreationRequest{
+		LongUrl: "",
+		UserId:  "e0dba740-fc4b-4977-872c-d360239e6b10",
+	})
+
+	h.CreateShortUrl(c)
+
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+}
+
+func TestCreateShortUrlEmptyUserId(t *testing.T) {
+	shortener := shortener.NewShortener()
+	cfg, err := config.NewConfig("../test.application.yml")
+	assert.NoError(t, err)
+	redisServer := miniredis.RunT(t)
+	redisClient := redis.NewClient(&redis.Options{
+		Addr: redisServer.Addr(),
+	})
+
+	storageService := store.StorageService{
+		RedisClient: redisClient,
+	}
+	h := handler.NewHandler(shortener, cfg, &storageService)
+	w := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(w)
+
+	c.Request = &http.Request{
+		Header: make(http.Header),
+	}
+
+	MockJSONPost(c, handler.UrlCreationRequest{
+		LongUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+		UserId:  "",
+	})
+
+	h.CreateShortUrl(c)
+
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+}
+
 func TestCreateShortUrlWithInvalidLink(t *testing.T) {
 	shortener := shortener.NewShortener()
 	cfg, err := config.NewConfig("../test.application.yml")
@@ -91,4 +154,100 @@ func TestCreateShortUrlWithInvalidLink(t *testing.T) {
 	h.CreateShortUrl(c)
 
 	assert.Equal(t, http.StatusBadRequest, w.Code)
+}
+
+func TestCreateShortUrlRedisFail(t *testing.T) {
+	shortener := shortener.NewShortener()
+	cfg, err := config.NewConfig("../test.application.yml")
+	assert.NoError(t, err)
+	redisServer := miniredis.RunT(t)
+	redisClient := redis.NewClient(&redis.Options{
+		Addr: redisServer.Addr(),
+	})
+
+	storageService := store.StorageService{
+		RedisClient: redisClient,
+	}
+	h := handler.NewHandler(shortener, cfg, &storageService)
+	w := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(w)
+
+	c.Request = &http.Request{
+		Header: make(http.Header),
+	}
+
+	MockJSONPost(c, handler.UrlCreationRequest{
+		LongUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+		UserId:  "e0dba740-fc4b-4977-872c-d360239e6b10",
+	})
+
+	redisServer.SetError("REDISDOWN")
+	h.CreateShortUrl(c)
+
+	assert.Equal(t, http.StatusInternalServerError, w.Code)
+}
+
+func TestRedirectShortUrlSuccess(t *testing.T) {
+	shortUrl := "NpHftVNe"
+	initialUrl := "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+
+	shortener := shortener.NewShortener()
+	cfg, err := config.NewConfig("../test.application.yml")
+	assert.NoError(t, err)
+	redisServer := miniredis.RunT(t)
+	redisClient := redis.NewClient(&redis.Options{
+		Addr: redisServer.Addr(),
+	})
+	ctx := context.TODO()
+	redisClient.Set(ctx, shortUrl, initialUrl, CacheDuration)
+
+	storageService := store.StorageService{
+		RedisClient: redisClient,
+	}
+	h := handler.NewHandler(shortener, cfg, &storageService)
+	w := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(w)
+
+	c.Request = &http.Request{
+		Header: make(http.Header),
+	}
+	c.AddParam("shortUrl", shortUrl)
+
+	h.HandleShortUrlRedirect(c)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+
+}
+
+func TestRedirectShortUrlRedisFail(t *testing.T) {
+	shortUrl := "NpHftVNe"
+	initialUrl := "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+
+	shortener := shortener.NewShortener()
+	cfg, err := config.NewConfig("../test.application.yml")
+	assert.NoError(t, err)
+	redisServer := miniredis.RunT(t)
+	redisClient := redis.NewClient(&redis.Options{
+		Addr: redisServer.Addr(),
+	})
+	ctx := context.TODO()
+	redisClient.Set(ctx, shortUrl, initialUrl, CacheDuration)
+
+	storageService := store.StorageService{
+		RedisClient: redisClient,
+	}
+	h := handler.NewHandler(shortener, cfg, &storageService)
+	w := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(w)
+
+	c.Request = &http.Request{
+		Header: make(http.Header),
+	}
+	c.AddParam("shortUrl", shortUrl)
+
+	redisServer.SetError("REDISDOWN")
+	h.HandleShortUrlRedirect(c)
+
+	assert.Equal(t, http.StatusNotFound, w.Code)
+
 }

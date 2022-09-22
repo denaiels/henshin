@@ -36,7 +36,7 @@ lint:
 test:
 	@echo "running tests..."
 	go mod tidy
-	go test -coverpkg=./... ./...
+	go test ./... -coverprofile cover.out
 
 # This will run the service 
 run: build

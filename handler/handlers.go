@@ -25,7 +25,7 @@ type handler struct {
 
 type UrlCreationRequest struct {
 	LongUrl string `json:"long_url" binding:"required"`
-	UserId  string `json:"user_id" binding:"required"`
+	UserId  string `json:"user_id"`
 }
 
 func NewHandler(shortener shortener.ShortenerI, cfg *config.Config, store store.StorageServiceI) HandlerI {
@@ -48,15 +48,23 @@ func (h *handler) CreateShortUrl(c *gin.Context) {
 		return
 	}
 
+	if creationRequest.UserId == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Please input a valid user id!"})
+		return
+	}
+
 	shortUrl, err := h.shortener.GenerateShortLink(creationRequest.LongUrl, creationRequest.UserId)
 	if err != nil {
 		log.Err(err).Msg("Error while generating short link because error while encoding with base58")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
 	err = h.store.SaveUrlMapping(c, shortUrl, creationRequest.LongUrl, creationRequest.UserId)
 	if err != nil {
 		log.Err(err).Msg(fmt.Sprintf("Failed saving key url | Error: %v - shortUrl: %s - originalUrl: %s", err, shortUrl, creationRequest.LongUrl))
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
 	}
 
 	host := fmt.Sprintf("http://%s:%s/", h.cfg.ServerHost, h.cfg.ServerPort)

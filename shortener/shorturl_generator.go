@@ -9,6 +9,7 @@ import (
 )
 
 type ShortenerI interface {
+	Base58Encoded(bytes []byte) (string, error)
 	GenerateShortLink(initialUrl string, userId string) (string, error)
 }
 
@@ -25,7 +26,7 @@ func hashSHA256(input string) []byte {
 	return algorithm.Sum(nil)
 }
 
-func base58Encoded(bytes []byte) (string, error) {
+func (s *shortener) Base58Encoded(bytes []byte) (string, error) {
 	encoding := base58.BitcoinEncoding
 	encoded, err := encoding.Encode(bytes)
 	if err != nil {
@@ -37,7 +38,8 @@ func base58Encoded(bytes []byte) (string, error) {
 func (s *shortener) GenerateShortLink(initialUrl string, userId string) (string, error) {
 	urlHashBytes := hashSHA256(initialUrl + userId)
 	generatedNumber := new(big.Int).SetBytes(urlHashBytes).Uint64()
-	finalString, err := base58Encoded([]byte(fmt.Sprintf("%d", generatedNumber)))
+	finalString, err := s.Base58Encoded([]byte(fmt.Sprintf("%d", generatedNumber)))
+	println("final string: ", finalString)
 	if err != nil {
 		return "", err
 	}
