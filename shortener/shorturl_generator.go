@@ -39,7 +39,6 @@ func (s *shortener) GenerateShortLink(initialUrl string, userId string) (string,
 	urlHashBytes := hashSHA256(initialUrl + userId)
 	generatedNumber := new(big.Int).SetBytes(urlHashBytes).Uint64()
 	finalString, err := s.Base58Encoded([]byte(fmt.Sprintf("%d", generatedNumber)))
-	println("final string: ", finalString)
 	if err != nil {
 		return "", err
 	}
