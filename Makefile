@@ -45,8 +45,3 @@ run: build
 
 # This will run CI
 ci: build lint
-
-# This will run the entire process from building, running, to cleaning again
-run.all:
-	make run
-	make clean
