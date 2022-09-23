@@ -1,6 +1,6 @@
-# URL Blaster
+# Henshin
 
-URL Blaster is a tool to shorten URLs.
+Henshin is a tool to transform long URL to a shortened version of it.
 
 For example you have a URL like this:
 
@@ -8,7 +8,7 @@ For example you have a URL like this:
 
 You can make a shorter version of it that can redirect back to the original URL like this:
 
-"https://localhost:9080/URLBlaster" -> just an example
+"https://localhost:9080/Henshin" -> just an example
 
 # Installation
 
